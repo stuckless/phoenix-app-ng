@@ -136,10 +136,19 @@ public class CardPresenter extends Presenter {
     }
 
     private CharSequence getTVContextText(MediaFile file) {
-        if (file.getEpisode()>0) {
-            return String.format("%dx%d %s",file.getSeason(), file.getEpisode(), file.getEpisodeTitle());
+        if (!MediaUtil.isGroupedItem(file) && file.getMediaFileId()==0) {
+            // scheduled recording
+            if (file.getEpisode() > 0) {
+                return String.format("%s %dx%d %s", MediaUtil.formatShortDateTimeForAiring(file), file.getSeason(), file.getEpisode(), file.getEpisodeTitle());
+            } else {
+                return String.format("%s %s", MediaUtil.formatShortDateTimeForAiring(file), file.getEpisodeTitle());
+            }
         } else {
-            return file.getEpisodeTitle();
+            if (file.getEpisode() > 0) {
+                return String.format("%dx%d %s", file.getSeason(), file.getEpisode(), file.getEpisodeTitle());
+            } else {
+                return file.getEpisodeTitle();
+            }
         }
     }
 

@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:text="@string/pref_recent_limit" android:defaultValue="30"
+    <EditTextPreference android:defaultValue="30"
         android:id="@+id/pref_recent_limit"
+        android:key="recent_limit"
         android:inputType="number"
-        android:summary="Recent Items"
-        android:contentDescription="Recent Items to Display"
+        android:title="Recent Items"
+        android:summary="Recent Items to Display"
+        android:numeric="integer"
         />
+
+    <EditTextPreference android:defaultValue="10"
+        android:id="@+id/pref_recommendation_limit"
+        android:key="recommendation_limit"
+        android:inputType="number"
+        android:title="Recommendations"
+        android:summary="Recommendations to display"
+        android:numeric="integer"
+        />
+
 </PreferenceScreen>

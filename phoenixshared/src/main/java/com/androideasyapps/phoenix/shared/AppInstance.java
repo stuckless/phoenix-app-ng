@@ -10,6 +10,8 @@ import com.androideasyapps.phoenix.dao.Server;
 import com.androideasyapps.phoenix.services.phoenix.PhoenixService;
 import com.androideasyapps.phoenix.services.sagetv.SageTVRequestInterceptor;
 import com.androideasyapps.phoenix.services.sagetv.SageTVService;
+import com.androideasyapps.phoenix.shared.prefs.PhoenixPreferences;
+import com.androideasyapps.phoenix.shared.prefs.PreferenceManager;
 import com.androideasyapps.phoenix.util.OnCompleteFuture;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -63,6 +65,8 @@ public class AppInstance {
 
     private MediaFile selectedMediaFile;
 
+    private PhoenixPreferences preferences;
+
     final ExecutorService executor;
     final Future<H2PersistenceManager> futureDAOManager;
     final OnCompleteFuture<Observable<MediaFile>> syncFuture = new OnCompleteFuture<>();
@@ -78,6 +82,9 @@ public class AppInstance {
 
     public AppInstance(Context ctx) {
         this.context = ctx;
+
+        preferences = PreferenceManager.getPreferences(PhoenixPreferences.class, android.preference.PreferenceManager.getDefaultSharedPreferences(ctx));
+
         executor = Executors.newCachedThreadPool();
         futureDAOManager = executor.submit(new Callable<H2PersistenceManager>() {
             @Override
@@ -119,7 +126,7 @@ public class AppInstance {
         });
 
         MediaSource recentMoviesUnwatched = new MediaSource("Recent Movies (Unwatched)",
-                "watched != true and mediatype='movie' and hasmetadata = true order by mediafileid desc limit 30");
+                "watched != true and mediatype='movie' and hasmetadata = true order by mediafileid desc limit " + preferences().recent_limit());
 
         // MediaSource recentTVUnwatched = new MediaSource("Recent TV (Unwatched)", "watched != true and mediatype='tv' order by originalairdate desc");
 
@@ -137,7 +144,7 @@ public class AppInstance {
         );
 
         MediaSource recentNoMetadata = new MediaSource("Recent No Metadata",
-                "hasmetadata != true and watched != true order by mediafileid desc limit 30");
+                "hasmetadata != true and watched != true order by mediafileid desc limit " + preferences().recent_limit());
 
 
         mediaSources.put(recentMoviesUnwatched.title, recentMoviesUnwatched);
@@ -319,6 +326,10 @@ public class AppInstance {
                 subscriber.onCompleted();
             }
         });
+    }
+
+    public PhoenixPreferences preferences() {
+        return preferences;
     }
 
 }

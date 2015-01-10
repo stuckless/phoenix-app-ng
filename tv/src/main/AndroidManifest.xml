@@ -54,6 +54,7 @@
         <activity android:name=".PlaybackOverlayActivity" />
         <activity android:name=".BrowseErrorActivity" />
         <activity android:name=".SageTVSearchActivity" />
+        <activity android:name=".settings.SettingsActivity" android:theme="@style/Theme.Leanback" />
 
         <service
             android:name=".recommend.UpdateRecommendationsService"

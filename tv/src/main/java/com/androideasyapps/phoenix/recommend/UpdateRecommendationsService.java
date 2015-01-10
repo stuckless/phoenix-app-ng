@@ -28,8 +28,6 @@ import rx.functions.Action1;
 public class UpdateRecommendationsService extends IntentService {
     private static final Logger log = LoggerFactory.getLogger(UpdateRecommendationsService.class);
 
-    private static final int MAX_RECOMMENDATIONS = 3;
-
     public UpdateRecommendationsService() {
         super("RecommendationService");
     }
@@ -38,7 +36,7 @@ public class UpdateRecommendationsService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         final AppInstance app = AppInstance.getInstance(this);
         log.info("Updating recommendation cards for SAGETV");
-        String query = "watched != true order by hasmetadata desc, mediafileid desc limit 10";
+        String query = "watched != true order by hasmetadata desc, mediafileid desc limit " + app.preferences().recommendation_limit();
         Observable<Collection<MediaFile>> files = app.getMediaItems(app.getDAOManager(), query);
         files.subscribe(new Action1<Collection<MediaFile>>() {
             @Override

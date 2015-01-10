@@ -54,6 +54,7 @@ import com.androideasyapps.phoenix.recommend.UpdateRecommendationsService;
 import com.androideasyapps.phoenix.services.phoenix.ViewItemMediaFileAdapter;
 import com.androideasyapps.phoenix.services.phoenix.model.ViewItem;
 import com.androideasyapps.phoenix.services.phoenix.model.ViewReply;
+import com.androideasyapps.phoenix.settings.SettingsActivity;
 import com.androideasyapps.phoenix.settings.SettingsFragment;
 import com.androideasyapps.phoenix.shared.AppInstance;
 import com.androideasyapps.phoenix.shared.MediaSource;
@@ -334,11 +335,8 @@ public class MainFragment extends BrowseFragment {
                     Intent intent = new Intent(getActivity(), BrowseErrorActivity.class);
                     startActivity(intent);
                 } else if (((String) item).contains(getString(R.string.personal_settings))) {
-                    // Display the fragment as the main content.
-//                    getFragmentManager().beginTransaction().
-//                            addToBackStack("setting")
-//                            .replace(android.R.id.content, new SettingsFragment())
-//                            .commit();
+                    Intent i = new Intent(getActivity(), SettingsActivity.class);
+                    startActivity(i);
                 } else {
                     Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT)
                             .show();
