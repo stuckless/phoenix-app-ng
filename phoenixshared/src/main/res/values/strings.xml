@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PhoenixShared</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="msg_connection_ok">Connected</string>
+    <string name="msg_checking_servers">Checking Servers...</string>
+    <string name="msg_checking_media">Checking Media...</string>
+    <string name="msg_syncing_mediafiles">Syncing Media...</string>
+    <string name="class_MediaBrowser">com.androideasyapps.phoenix.MainActivity</string>
+    <string name="msg_connection_failed">Failed to connect to the SageTV Server.  Check your settings.</string>
+    <string name="msg_sync_failed">Sync failed</string>
+
+</resources>

@@ -1,0 +1,28 @@
+<model name="MediaFile" version="4">
+    <field name="mediaFileId" index="true" type="long" comment="SageTV MediaFileID"/>
+
+	<field name="title" index="true" required="true" type="text" length="256"/>
+	<field name="year" index="true" type="int"/>
+	
+	<field name="mediaType" index="true" type="text" length="20" values="tv,movie,music,picture"/>
+	
+	<field name="season" index="true" type="int"/>
+	<field name="episode" index="true" type="int"/>
+	<field name="episodeTitle" type="text"/>
+	
+	<field name="duration" index="false" type="long" comment="Length in ms"/>
+	<field name="originalAirDate" index="false" type="long" comment="Original Air Date"/>
+	<field name="fileDate" index="false" type="long" comment="DVD Date"/>
+    <field name="watched" index="true" type="boolean" comment="isWatched"/>
+
+	<field name="description" type="clob"/>
+	<field name="userRating" type="int"/>
+	<field name="trailerURL" type="text"/>
+	<field name="genre" type="text" index="true"/>
+    <field name="rating" type="text" version="2" index="true"/>
+
+    <field name="userdata" type="text" comment="any user defined text that needs storage" version="3"/>
+    <field name="parts" type="int" version="3"/>
+
+    <field name="hasmetadata" index="true" type="boolean" version="4" comment="true if it has been fully scraped by BMT"/>
+</model>

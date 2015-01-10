@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.androideasyapps.phoenix" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="true" />
+
+    <application
+        android:largeHeap="true"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:banner="@drawable/sagetv"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Leanback" >
+
+        <activity
+            android:name=".MainActivity">
+        </activity>
+
+        <activity
+            android:name=".shared.StartupActivity"
+            android:icon="@drawable/app_icon_your_company"
+            android:label="@string/app_name"
+            android:logo="@drawable/app_icon_your_company"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".DetailsActivity"
+            android:exported="true">
+            <!-- Receives the search request. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <!-- No category needed, because the Intent will specify this class component-->
+            </intent-filter>
+
+            <!-- Points to searchable meta data. -->
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+                />
+        </activity>
+        <activity android:name=".PlaybackOverlayActivity" />
+        <activity android:name=".BrowseErrorActivity" />
+        <activity android:name=".SageTVSearchActivity" />
+
+        <service
+            android:name=".recommend.UpdateRecommendationsService"
+            android:enabled="true" />
+
+        <receiver android:name=".BootupActivity"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <provider android:name=".homesearch.SuggestionProvider"
+            android:authorities="com.androideasyapps.phoenix"
+            android:exported="true" />
+    </application>
+
+</manifest>

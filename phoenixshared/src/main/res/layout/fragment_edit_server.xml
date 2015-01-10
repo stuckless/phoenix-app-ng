@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.androideasyapps.phoenix.shared.EditServerFragment"
+    android:padding="10dp"
+    >
+
+    <LinearLayout
+        android:layout_above="@+id/btnConnect"
+        android:id="@+id/fields"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView android:text="Display Name"
+            style="@style/FormLabel"
+            />
+
+        <EditText
+            android:id="@+id/displayName"
+            style="@style/FormEdit"
+            android:text="SageTV"
+            />
+
+        <TextView android:text="Host"
+            style="@style/FormLabel"
+            />
+        <EditText
+            android:id="@+id/host"
+            style="@style/FormEdit"
+            android:text="192.168.1.10"
+            />
+
+        <TextView android:text="Port"
+            style="@style/FormLabel"
+            />
+        <EditText
+            android:id="@+id/port"
+            style="@style/FormEdit"
+            android:text="8080"
+            />
+
+        <TextView android:text="Username"
+            style="@style/FormLabel"
+            />
+        <EditText
+            android:id="@+id/username"
+            style="@style/FormEdit"
+            android:text="sage"
+            />
+
+        <TextView android:text="Password"
+            style="@style/FormLabel"
+            />
+        <EditText
+            android:inputType="textPassword"
+            android:id="@+id/password"
+            style="@style/FormEdit"
+            android:text="frey"
+            />
+
+        </LinearLayout>
+
+    <Button
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/btnConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CONNECT"
+        />
+
+
+</RelativeLayout>

@@ -1,0 +1,12 @@
+<model name="Server" version="1">
+    <field name="serverId" index="true" type="text"/>
+
+	<field name="title" index="true" required="true" type="text"/>
+	<field name="host" index="false" type="text"/>
+	<field name="port" index="false" type="int"/>
+	
+	<field name="username" type="text"/>
+	<field name="password" type="text"/>
+
+	<field name="isDefault" type="boolean"/>
+</model>
