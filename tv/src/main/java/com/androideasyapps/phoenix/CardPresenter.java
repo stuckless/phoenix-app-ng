@@ -45,19 +45,14 @@ public class CardPresenter extends Presenter {
     private static int CARD_WIDTH = 150*2;
     private static int CARD_HEIGHT = 200*2;
 
-//    private static int CARD_WIDTH = 150;
-//    private static int CARD_HEIGHT = 200;
-
     static class ViewHolder extends Presenter.ViewHolder {
         private MediaFile mMovie;
         private ImageCardView mCardView;
         private Drawable mDefaultCardImage;
-        private PicassoImageCardViewTarget mImageCardViewTarget;
 
         public ViewHolder(View view) {
             super(view);
             mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
             mDefaultCardImage = mContext.getResources().getDrawable(R.drawable.movie);
         }
 
@@ -73,24 +68,6 @@ public class CardPresenter extends Presenter {
             return mCardView;
         }
 
-        protected void updateCardViewImage(URI uri) {
-            mCardView.getMainImageView().setImageBitmap(null);
-            if (MediaUtil.isTV(getMovie())) {
-                Picasso.with(mContext)
-                        .load(uri.toString())
-                        .resize(Utils.convertDpToPixel(mContext, CARD_WIDTH),
-                                Utils.convertDpToPixel(mContext, CARD_HEIGHT))
-                        .error(R.drawable.posterblank)
-                        .into(mImageCardViewTarget);
-            } else {
-                Picasso.with(mContext)
-                        .load(uri.toString())
-                        .resize(Utils.convertDpToPixel(mContext, CARD_WIDTH),
-                                Utils.convertDpToPixel(mContext, CARD_HEIGHT))
-                        .error(R.drawable.posterblank)
-                        .into(mImageCardViewTarget);
-            }
-        }
         protected void updateCardViewImageUIL(URI uri) {
             mCardView.getMainImageView().setImageBitmap(null);
                 ImageLoader.getInstance().loadImage(uri.toString(), new ImageSize(Utils.convertDpToPixel(mContext, CARD_WIDTH),
@@ -185,29 +162,5 @@ public class CardPresenter extends Presenter {
     @Override
     public void onViewAttachedToWindow(Presenter.ViewHolder viewHolder) {
         // TO DO
-    }
-
-    public static class PicassoImageCardViewTarget implements Target {
-        private ImageCardView mImageCardView;
-
-        public PicassoImageCardViewTarget(ImageCardView imageCardView) {
-            mImageCardView = imageCardView;
-        }
-
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
-            Drawable bitmapDrawable = new BitmapDrawable(mContext.getResources(), bitmap);
-            mImageCardView.setMainImage(bitmapDrawable);
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable drawable) {
-            mImageCardView.setMainImage(drawable);
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable drawable) {
-            // Do nothing, default_background manager has its own transitions
-        }
     }
 }

@@ -40,6 +40,8 @@ import java.util.concurrent.Future;
 import retrofit.RestAdapter;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by seans on 21/12/14.
@@ -325,8 +327,28 @@ public class AppInstance {
                 }
                 subscriber.onCompleted();
             }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<Collection<MediaFile>> getMediaItems(final Future<H2PersistenceManager> dao, final MediaSource source, final MediaFile sourceFile) {
+        return Observable.create(new Observable.OnSubscribe<Collection<MediaFile>>() {
+            @Override
+            public void call(Subscriber<? super Collection<MediaFile>> subscriber) {
+                subscriber.onStart();
+                try {
+                    if (source instanceof SubGroupMediaSource) {
+                        subscriber.onNext(dao.get().getMediaFileDAO().query(source.query, new Object[]{((SubGroupMediaSource)source).resolver.getValue(sourceFile)}));
+                    } else {
+                        subscriber.onNext(dao.get().getMediaFileDAO().query(source.query));
+                    }
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+                subscriber.onCompleted();
+            }
         });
     }
+
 
     public PhoenixPreferences preferences() {
         return preferences;

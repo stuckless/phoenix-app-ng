@@ -3,10 +3,10 @@ package com.androideasyapps.phoenix;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.concurrent.Future;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,23 +31,24 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
-import com.androideasyapps.phoenix.dao.H2PersistenceManager;
 import com.androideasyapps.phoenix.dao.MediaFile;
 import com.androideasyapps.phoenix.dao.Server;
 import com.androideasyapps.phoenix.shared.AppInstance;
 import com.androideasyapps.phoenix.shared.MediaSource;
-import com.androideasyapps.phoenix.shared.SubGroupMediaSource;
 import com.androideasyapps.phoenix.util.MediaUtil;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import rx.Observable;
-import rx.Subscriber;
+import rx.android.observables.AndroidObservable;
 import rx.functions.Action1;
 
 public class VideoDetailsFragment extends DetailsFragment {
@@ -98,6 +99,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         updateBackground(URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(this.getActivity()).getServer(), mSelectedMovie)));
         setOnItemViewClickedListener(new ItemViewClickedListener());
 
+        Log.i(TAG, "onCreate DetailsFragment Complete");
     }
 
     @Override
@@ -126,16 +128,27 @@ public class VideoDetailsFragment extends DetailsFragment {
         protected DetailsOverviewRow doInBackground(MediaFile... movies) {
             mSelectedMovie = movies[0];
 
-            DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
+            final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
             try {
-                Bitmap poster = Picasso.with(getActivity())
-                        .load(MediaUtil.getPosterURL(server, mSelectedMovie))
-                                .resize(Utils.convertDpToPixel(getActivity().getApplicationContext(), DETAIL_THUMB_WIDTH),
-                                        Utils.convertDpToPixel(getActivity().getApplicationContext(), DETAIL_THUMB_HEIGHT))
-                                .centerCrop()
-                                .get();
-                row.setImageBitmap(getActivity(), poster);
-            } catch (IOException e) {
+                ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie),
+                        new ImageSize(Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH),
+                        Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_HEIGHT)),
+                        new SimpleImageLoadingListener() {
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+                        System.out.println("Poster is loaded..");
+                        row.setImageBitmap(getActivity(), bitmap);
+                    }
+                });
+
+//                Bitmap poster = Picasso.with(getActivity())
+//                        .load(MediaUtil.getPosterURL(server, mSelectedMovie))
+//                                .resize(Utils.convertDpToPixel(getActivity().getApplicationContext(), DETAIL_THUMB_WIDTH),
+//                                        Utils.convertDpToPixel(getActivity().getApplicationContext(), DETAIL_THUMB_HEIGHT))
+//                                .centerCrop()
+//                                .get();
+//                row.setImageBitmap(getActivity(), poster);
+            } catch (Exception e) {
             }
 
             if (mSelectedMovie.getMediaFileId()>0) {
@@ -146,10 +159,6 @@ public class VideoDetailsFragment extends DetailsFragment {
                 row.addAction(watchedAction);
             }
 
-            //row.addAction(new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
-            //        getResources().getString(R.string.rent_2)));
-            //row.addAction(new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
-            //        getResources().getString(R.string.buy_2)));
             return row;
         }
 
@@ -179,7 +188,6 @@ public class VideoDetailsFragment extends DetailsFragment {
                         intent.putExtra(getResources().getString(R.string.movie), mSelectedMovie);
                         intent.putExtra(getResources().getString(R.string.should_start), true);
                         startActivity(intent);
-                        // smb://mediaserver/media/videos/movies
                     } else if (action.getId() == ACTION_WATCH_EXT) {
                         try {
                             Uri uri = Uri.parse(MediaUtil.getVideoURLWithEmbeddedAuth(AppInstance.getInstance(getActivity()).getServer(), mSelectedMovie));
@@ -190,17 +198,6 @@ public class VideoDetailsFragment extends DetailsFragment {
                             t.printStackTrace();
                             Toast.makeText(getActivity(), "No External Players", Toast.LENGTH_SHORT).show();
                         }
-//                        try {
-//                            Uri uri = Uri.parse("smb://192.168.1.10/media/videos/movies/A%20Good%20Marriage%20(2014).mkv");
-//                            Log.i(TAG, "URLL " + uri);
-//                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//                            intent.setDataAndType(uri, "video/*");
-//                            startActivity(intent);
-//                        } catch (Throwable t) {
-//                            t.printStackTrace();
-//                            Toast.makeText(getActivity(), "No External Players", Toast.LENGTH_SHORT).show();
-//                        }
-
                     } else if (action.getId() == ACTION_SET_WATCHED) {
                         mSelectedMovie.setWatched(!mSelectedMovie.getWatched());
                         updateWatchedUI(true);
@@ -241,51 +238,55 @@ public class VideoDetailsFragment extends DetailsFragment {
                 }
             }
 
+            if (MediaUtil.isMovie(mSelectedMovie)) {
+                populateRelatedGenres(adapter, mSelectedMovie);
+            }
+
             setAdapter(adapter);
         }
 
     }
 
+    private void populateRelatedGenres(ArrayObjectAdapter adapter, MediaFile file) {
+        String genre=file.getGenre();
+        if (genre!=null) {
+            String parts[] = genre.split("\\s*/\\s*");
+            addAndPopulateGenreView(adapter, file, parts[0]);
+            if (parts.length>1) {
+                addAndPopulateGenreView(adapter, file, parts[1]);
+            }
+        }
+    }
+
+    private void addAndPopulateGenreView(ArrayObjectAdapter adapter, MediaFile file, String genre) {
+        long st=System.currentTimeMillis();
+        ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
+        MediaSource ms = new MediaSource("Other Movies with " + genre + " Genre", "mediatype='movie' and genre like '%"+genre+"%' order by year desc, mediafileid desc limit 10");
+        populateSource(listRowAdapter, ms);
+        HeaderItem header = new HeaderItem(0, ms.title, null);
+        adapter.add(new ListRow(header, listRowAdapter));
+        long et=System.currentTimeMillis();
+        System.out.println("Created Genres in " + (et-st) +"ms");
+    }
+
     private void populateSource(ArrayObjectAdapter listRowAdapter, MediaSource source) {
         if (source.subGroupMediaSource==null) {
             populateListRowAdapter(listRowAdapter, source);
-//        } else {
-//            populateListRowAdapterForGroup(listRowAdapter, source);
         }
     }
     private void populateListRowAdapter(final ArrayObjectAdapter listRowAdapter, MediaSource source) {
-        getMediaItems(AppInstance.getInstance(this.getActivity()).getDAOManager(), source).subscribe(new Action1<Collection<MediaFile>>() {
-            @Override
-            public void call(Collection<MediaFile> mediaFiles) {
-                if (mediaFiles!=null) {
-                    for (MediaFile mf: mediaFiles) {
-                        listRowAdapter.add(mf);
+        AndroidObservable.bindFragment(this, AppInstance.getInstance(getActivity()).getMediaItems(AppInstance.getInstance(this.getActivity()).getDAOManager(), source, mSelectedMovie))
+                .subscribe(new Action1<Collection<MediaFile>>() {
+                    @Override
+                    public void call(Collection<MediaFile> mediaFiles) {
+                        if (mediaFiles != null) {
+                            for (MediaFile mf : mediaFiles) {
+                                listRowAdapter.add(mf);
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
     }
-
-    Observable<Collection<MediaFile>> getMediaItems(final Future<H2PersistenceManager> dao, final MediaSource source) {
-        return Observable.create(new Observable.OnSubscribe<Collection<MediaFile>>() {
-            @Override
-            public void call(Subscriber<? super Collection<MediaFile>> subscriber) {
-                subscriber.onStart();
-                try {
-                    if (source instanceof SubGroupMediaSource) {
-                        subscriber.onNext(dao.get().getMediaFileDAO().query(source.query, new Object[]{((SubGroupMediaSource)source).resolver.getValue(mSelectedMovie)}));
-                    } else {
-                        subscriber.onNext(dao.get().getMediaFileDAO().query(source.query));
-                    }
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-                subscriber.onCompleted();
-            }
-        });
-    }
-
-
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override

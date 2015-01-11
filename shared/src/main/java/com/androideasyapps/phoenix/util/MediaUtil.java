@@ -166,4 +166,8 @@ public class MediaUtil {
         String str = String.format("%d mins", minutes);
         return str + ((movie.getGenre()!=null)?(" " + movie.getGenre()):"");
     }
+
+    public static boolean isMovie(MediaFile file) {
+        return file!=null&&"movie".equalsIgnoreCase(file.getMediaType());
+    }
 }
