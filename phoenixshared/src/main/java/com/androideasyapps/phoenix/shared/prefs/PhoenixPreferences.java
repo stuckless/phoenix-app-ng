@@ -7,17 +7,17 @@ public interface PhoenixPreferences {
     /**
      * Limits the number of items to show for "recent" querries
      * NOTE: relates to the "recent_limit" key in preferences.xml
+     *
      * @return
      */
-    public int recent_limit();
-    public void recent_limit(int limit);
+    public int recent_limit(int def);
 
     /**
      * Limits the number of items to show for "recommendations"
      * NOTE: relates to the "recommendation_limit" key in preferences.xml
+     *
      * @return
      */
-    public int recommendation_limit();
-    public void recommendation_limit(int limit);
+    public int recommendation_limit(int def);
 
 }

@@ -15,11 +15,11 @@ import com.androideasyapps.phoenix.util.MediaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import rx.Observable;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /*
  * This class builds up to MAX_RECOMMMENDATIONS of recommendations and defines what happens
@@ -35,9 +35,14 @@ public class UpdateRecommendationsService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         final AppInstance app = AppInstance.getInstance(this);
+        if (!app.isReady()) {
+            log.info("App not ready");
+            return;
+        }
         log.info("Updating recommendation cards for SAGETV");
-        String query = "watched != true order by hasmetadata desc, mediafileid desc limit " + app.preferences().recommendation_limit();
-        Observable<Collection<MediaFile>> files = app.getMediaItems(app.getDAOManager(), query);
+        String query = "watched != true order by hasmetadata desc, mediafileid desc limit " + app.preferences().recommendation_limit(5);
+        // change the observeOn to be the background thread, but defauilt, it is the main thread
+        Observable<Collection<MediaFile>> files = app.getMediaItems(app.getDAOManager(), query).observeOn(Schedulers.io());
         files.subscribe(new Action1<Collection<MediaFile>>() {
             @Override
             public void call(Collection<MediaFile> mediaFiles) {

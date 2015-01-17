@@ -1,11 +1,12 @@
 package com.androideasyapps.phoenix.shared;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.provider.MediaStore;
+import android.content.Intent;
 
 import com.androideasyapps.phoenix.dao.H2PersistenceManager;
 import com.androideasyapps.phoenix.dao.MediaFile;
-import com.androideasyapps.phoenix.dao.MediaFileH2DAO;
 import com.androideasyapps.phoenix.dao.Server;
 import com.androideasyapps.phoenix.services.phoenix.PhoenixService;
 import com.androideasyapps.phoenix.services.sagetv.SageTVRequestInterceptor;
@@ -18,8 +19,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
 import org.slf4j.Logger;
@@ -27,12 +26,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -128,7 +126,7 @@ public class AppInstance {
         });
 
         MediaSource recentMoviesUnwatched = new MediaSource("Recent Movies (Unwatched)",
-                "watched != true and mediatype='movie' and hasmetadata = true order by mediafileid desc limit " + preferences().recent_limit());
+                "watched != true and mediatype='movie' and hasmetadata = true order by mediafileid desc limit " + preferences().recent_limit(30));
 
         // MediaSource recentTVUnwatched = new MediaSource("Recent TV (Unwatched)", "watched != true and mediatype='tv' order by originalairdate desc");
 
@@ -146,13 +144,19 @@ public class AppInstance {
         );
 
         MediaSource recentNoMetadata = new MediaSource("Recent No Metadata",
-                "hasmetadata != true and watched != true order by mediafileid desc limit " + preferences().recent_limit());
+                "hasmetadata != true and watched != true order by mediafileid desc limit " + preferences().recent_limit(30));
 
 
         mediaSources.put(recentMoviesUnwatched.title, recentMoviesUnwatched);
         // mediaSources.put(recentTVUnwatched.title, recentTVUnwatched);
         mediaSources.put(recentTVUnwatchedGrouped.title, recentTVUnwatchedGrouped);
         mediaSources.put(recentNoMetadata.title, recentNoMetadata);
+
+        initImageLoader();
+
+        // start the scheduler for syncing
+        scheduleSyncUpdate(context, false);
+        scheduleRecommendationUpdate(context, false);
     }
 
     public PhoenixService getPhoenixService() {
@@ -307,6 +311,9 @@ public class AppInstance {
 
 
         // Initialize ImageLoader with configuration.
+        if (ImageLoader.getInstance().isInited()) {
+            ImageLoader.getInstance().destroy();
+        }
         ImageLoader.getInstance().init(config);
     }
 
@@ -352,6 +359,94 @@ public class AppInstance {
 
     public PhoenixPreferences preferences() {
         return preferences;
+    }
+
+    public boolean isReady() {
+        try {
+            // getServer() will thrown an exception if we can't get the server.
+            Server server = getServer();
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public void scheduleSyncUpdate(Context context, boolean update) {
+        Calendar now = Calendar.getInstance();
+        Calendar later = Calendar.getInstance();
+        later.add(Calendar.DAY_OF_YEAR, 1);
+        later.set(Calendar.HOUR_OF_DAY, 0);
+        later.set(Calendar.MINUTE, 0);
+        later.set(Calendar.SECOND, 0);
+        later.set(Calendar.MILLISECOND, 0);
+
+        log.info("SageTV Scheduling Sync update to happen every day starting at " + later.getTime());
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent syncIntent = new Intent(context, SageTVSyncService.class);
+
+        if (!update && checkAlarmIfExists(alarmManager, context, syncIntent)) {
+            log.info("Alarm already configured for {}", syncIntent);
+            return;
+        }
+
+        cancelAlarmIfExists(alarmManager, context, syncIntent);
+
+        PendingIntent alarmIntent = PendingIntent.getService(context, 0, syncIntent, 0);
+
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                later.getTimeInMillis() - now.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY,
+                alarmIntent);
+    }
+
+    public void scheduleRecommendationUpdate(Context context, boolean update) {
+        log.info("SageTV Scheduling recommendations update");
+
+        try {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            Intent recommendationIntent = new Intent(context, Class.forName("com.androideasyapps.phoenix.recommend.UpdateRecommendationsService"));
+
+            if (!update && checkAlarmIfExists(alarmManager, context, recommendationIntent)) {
+                log.info("Alarm already configured for {}", recommendationIntent);
+                return;
+            }
+
+            cancelAlarmIfExists(alarmManager, context, recommendationIntent);
+
+            PendingIntent alarmIntent = PendingIntent.getService(context, 0, recommendationIntent, 0);
+
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    5000,
+                    AlarmManager.INTERVAL_HALF_HOUR,
+                    alarmIntent);
+        } catch (Throwable t) {
+            log.error("Failed to install recommendation alarm", t);
+        }
+    }
+
+    void cancelAlarmIfExists(AlarmManager manager, Context mContext, Intent intent) {
+        try {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
+            if (pendingIntent != null) {
+                log.info("Cancelling Alarm for {}", intent);
+                manager.cancel(pendingIntent);
+            } else {
+                log.info("No Pending Alarm for {}", intent);
+            }
+        } catch (Exception e) {
+            log.warn("Error during cancelling Alarm for {}", intent);
+        }
+    }
+
+    boolean checkAlarmIfExists(AlarmManager manager, Context mContext, Intent intent) {
+        try {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
+            return pendingIntent != null;
+        } catch (Exception e) {
+            log.warn("Error during checking Alarm for {}", intent);
+        }
+        return false;
     }
 
 }

@@ -12,24 +12,23 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
+//println("StoreFile: " + android.signingConfigs.debug.storeFile.absolutePath);
+
 dependencies {
-    compile(project(":shared")) {
+    compile(project(':shared')) {
         exclude group: 'org.slf4j'
     }
-
-    compile(project(":phoenixshared")) {
+    compile(project(':phoenixshared')) {
 
     }
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:recyclerview-v7:21.0.3'
     compile 'com.android.support:leanback-v17:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'

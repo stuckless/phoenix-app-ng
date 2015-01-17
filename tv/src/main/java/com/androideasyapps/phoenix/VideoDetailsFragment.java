@@ -1,12 +1,7 @@
 package com.androideasyapps.phoenix;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collection;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -44,6 +39,9 @@ import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.net.URI;
+import java.util.Collection;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -116,8 +114,8 @@ public class VideoDetailsFragment extends DetailsFragment {
         } else {
             watchedAction.setLabel1(getResources().getString(R.string.set_watched));
         }
-        if (refresh && adapter!=null) {
-            adapter.notifyArrayItemRangeChanged(0,adapter.size());
+        if (refresh && adapter != null) {
+            adapter.notifyArrayItemRangeChanged(0, adapter.size());
         }
     }
 
@@ -132,14 +130,14 @@ public class VideoDetailsFragment extends DetailsFragment {
             try {
                 ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie),
                         new ImageSize(Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH),
-                        Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_HEIGHT)),
+                                Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_HEIGHT)),
                         new SimpleImageLoadingListener() {
-                    @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
-                        System.out.println("Poster is loaded..");
-                        row.setImageBitmap(getActivity(), bitmap);
-                    }
-                });
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view, Bitmap bitmap) {
+                                System.out.println("Poster is loaded..");
+                                row.setImageBitmap(getActivity(), bitmap);
+                            }
+                        });
 
 //                Bitmap poster = Picasso.with(getActivity())
 //                        .load(MediaUtil.getPosterURL(server, mSelectedMovie))
@@ -151,7 +149,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             } catch (Exception e) {
             }
 
-            if (mSelectedMovie.getMediaFileId()>0) {
+            if (mSelectedMovie.getMediaFileId() > 0) {
                 row.addAction(new Action(ACTION_WATCH, getResources().getString(
                         R.string.watch)));
                 row.addAction(new Action(ACTION_WATCH_EXT, getResources().getString(R.string.watch_ext)));
@@ -165,7 +163,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         private Callback<Void> VOIDCallback = new Callback<Void>() {
             @Override
             public void success(Void aVoid, Response response) {
-                System.out.println("callback complete ok" );
+                System.out.println("callback complete ok");
             }
 
             @Override
@@ -230,7 +228,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
             if (!TextUtils.isEmpty(mSelectedMovie.getUserdata())) {
                 MediaSource ms = AppInstance.getInstance(getActivity()).getMediaSources().get(mSelectedMovie.getUserdata());
-                if (ms!=null) {
+                if (ms != null) {
                     ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
                     populateSource(listRowAdapter, ms.subGroupMediaSource);
                     HeaderItem header = new HeaderItem(0, "Episodes", null);
@@ -248,32 +246,33 @@ public class VideoDetailsFragment extends DetailsFragment {
     }
 
     private void populateRelatedGenres(ArrayObjectAdapter adapter, MediaFile file) {
-        String genre=file.getGenre();
-        if (genre!=null) {
+        String genre = file.getGenre();
+        if (genre != null) {
             String parts[] = genre.split("\\s*/\\s*");
             addAndPopulateGenreView(adapter, file, parts[0]);
-            if (parts.length>1) {
+            if (parts.length > 1) {
                 addAndPopulateGenreView(adapter, file, parts[1]);
             }
         }
     }
 
     private void addAndPopulateGenreView(ArrayObjectAdapter adapter, MediaFile file, String genre) {
-        long st=System.currentTimeMillis();
+        long st = System.currentTimeMillis();
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
-        MediaSource ms = new MediaSource("Other Movies with " + genre + " Genre", "mediatype='movie' and genre like '%"+genre+"%' order by year desc, mediafileid desc limit 10");
+        MediaSource ms = new MediaSource("Other Movies with " + genre + " Genre", "mediatype='movie' and genre like '%" + genre + "%' order by year desc, mediafileid desc limit 10");
         populateSource(listRowAdapter, ms);
         HeaderItem header = new HeaderItem(0, ms.title, null);
         adapter.add(new ListRow(header, listRowAdapter));
-        long et=System.currentTimeMillis();
-        System.out.println("Created Genres in " + (et-st) +"ms");
+        long et = System.currentTimeMillis();
+        System.out.println("Created Genres in " + (et - st) + "ms");
     }
 
     private void populateSource(ArrayObjectAdapter listRowAdapter, MediaSource source) {
-        if (source.subGroupMediaSource==null) {
+        if (source.subGroupMediaSource == null) {
             populateListRowAdapter(listRowAdapter, source);
         }
     }
+
     private void populateListRowAdapter(final ArrayObjectAdapter listRowAdapter, MediaSource source) {
         AndroidObservable.bindFragment(this, AppInstance.getInstance(getActivity()).getMediaItems(AppInstance.getInstance(this.getActivity()).getDAOManager(), source, mSelectedMovie))
                 .subscribe(new Action1<Collection<MediaFile>>() {

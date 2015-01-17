@@ -14,17 +14,14 @@ package com.androideasyapps.phoenix;
  * the License.
  */
 
-        import android.app.AlarmManager;
-        import android.app.PendingIntent;
-        import android.content.BroadcastReceiver;
-        import android.content.Context;
-        import android.content.Intent;
-        import android.util.Log;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 
-        import com.androideasyapps.phoenix.recommend.UpdateRecommendationsService;
+import com.androideasyapps.phoenix.shared.AppInstance;
 
-        import org.slf4j.Logger;
-        import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * This class extends BroadCastReceiver and publishes recommendations on bootup
@@ -32,26 +29,13 @@ package com.androideasyapps.phoenix;
 public class BootupActivity extends BroadcastReceiver {
     private static final Logger log = LoggerFactory.getLogger(BootupActivity.class);
 
-    private static final long INITIAL_DELAY = 5000;
-
     @Override
     public void onReceive(Context context, Intent intent) {
         log.info("SageTV BootupActivity initiated");
         if (intent.getAction().endsWith(Intent.ACTION_BOOT_COMPLETED)) {
-            scheduleRecommendationUpdate(context);
+            // start the sync services if they are not already started
+            AppInstance.getInstance(context).scheduleRecommendationUpdate(context, false);
+            AppInstance.getInstance(context).scheduleSyncUpdate(context, false);
         }
-    }
-
-    private void scheduleRecommendationUpdate(Context context) {
-        log.info("SageTV Scheduling recommendations update");
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent recommendationIntent = new Intent(context, UpdateRecommendationsService.class);
-        PendingIntent alarmIntent = PendingIntent.getService(context, 0, recommendationIntent, 0);
-
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                INITIAL_DELAY,
-                AlarmManager.INTERVAL_HALF_HOUR,
-                alarmIntent);
     }
 }

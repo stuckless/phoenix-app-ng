@@ -9,7 +9,6 @@ import com.androideasyapps.phoenix.services.sagetv.model.MediaFileResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -76,12 +75,8 @@ public class SageTVSync {
                                                          log.warn("Airing is Null for: {}", mf.MediaFileID);
                                                          continue;
                                                      }
-                                                     sageids.add(mf.MediaFileID);
-                                                     existingMF=null;
-                                                     try {
-                                                         existingMF = dao.queryFirst("mediafileid=?", mf.MediaFileID);
-                                                     } catch (Exception e) {
-                                                         log.error("Failed which finding {}", mf.MediaFileID, e);
+
+                                                     if (mf.MediaFileID == 0) {
                                                          continue;
                                                      }
 
@@ -90,7 +85,12 @@ public class SageTVSync {
                                                          continue;
                                                      }
 
-                                                     if (mf.MediaFileID == 0) {
+                                                     sageids.add(mf.MediaFileID);
+                                                     existingMF = null;
+                                                     try {
+                                                         existingMF = dao.queryFirst("mediafileid=?", mf.MediaFileID);
+                                                     } catch (Exception e) {
+                                                         log.error("Failed which finding {}", mf.MediaFileID, e);
                                                          continue;
                                                      }
 

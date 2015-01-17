@@ -1,6 +1,5 @@
 package com.androideasyapps.phoenix.shared.prefs;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.lang.reflect.InvocationHandler;
@@ -14,7 +13,7 @@ public class PreferenceManager implements InvocationHandler {
     private final SharedPreferences preferences;
 
     public PreferenceManager(SharedPreferences preferences) {
-        this.preferences=preferences;
+        this.preferences = preferences;
     }
 
     @Override
@@ -23,12 +22,12 @@ public class PreferenceManager implements InvocationHandler {
             return method.invoke(proxy, args);
         }
 
-        if (args!=null&&args.length==1) {
+        if (method.getReturnType() == void.class || method.getReturnType() == Void.class) {
             // set
             if (isBoolean(args[0].getClass())) {
-                preferences.edit().putBoolean(method.getName(), (boolean)args[0]).apply();
+                preferences.edit().putBoolean(method.getName(), (boolean) args[0]).apply();
             } else if (isFloat(args[0].getClass())) {
-                preferences.edit().putFloat(method.getName(), (float)args[0]).apply();
+                preferences.edit().putFloat(method.getName(), (float) args[0]).apply();
             } else if (isInt(args[0].getClass())) {
                 preferences.edit().putInt(method.getName(), (int) args[0]).apply();
             } else if (isLong(args[0].getClass())) {
@@ -44,13 +43,13 @@ public class PreferenceManager implements InvocationHandler {
             // Note: Android Preferences are stored as strings, so, we have to use getString() and then parse...
             // begs the question, why does Preference have getInteger() etc, if we can;t use them.
             if (isBoolean(method.getReturnType())) {
-                return Boolean.parseBoolean(preferences.getString(method.getName(), "false"));
+                return Boolean.parseBoolean(preferences.getString(method.getName(), (args != null && args.length > 0) ? args[0].toString() : "false"));
             } else if (isFloat(method.getReturnType())) {
-                return Float.parseFloat(preferences.getString(method.getName(), "0"));
+                return Float.parseFloat(preferences.getString(method.getName(), (args != null && args.length > 0) ? args[0].toString() : "0"));
             } else if (isInt(method.getReturnType())) {
-                return Integer.parseInt(preferences.getString(method.getName(), "0"));
+                return Integer.parseInt(preferences.getString(method.getName(), (args != null && args.length > 0) ? args[0].toString() : "0"));
             } else if (isLong(method.getReturnType())) {
-                return Long.parseLong(preferences.getString(method.getName(), "0"));
+                return Long.parseLong(preferences.getString(method.getName(), (args != null && args.length > 0) ? args[0].toString() : "0"));
             } else if (isString(method.getReturnType())) {
                 return preferences.getString(method.getName(), "");
             } else {
@@ -64,16 +63,19 @@ public class PreferenceManager implements InvocationHandler {
     }
 
     private boolean isBoolean(Class<? extends Object> aClass) {
-        return aClass==Boolean.class || aClass == boolean.class;
+        return aClass == Boolean.class || aClass == boolean.class;
     }
+
     private boolean isFloat(Class<? extends Object> aClass) {
-        return aClass==Float.class || aClass == float.class;
+        return aClass == Float.class || aClass == float.class;
     }
+
     private boolean isInt(Class<? extends Object> aClass) {
-        return aClass==Integer.class || aClass == int.class;
+        return aClass == Integer.class || aClass == int.class;
     }
+
     private boolean isLong(Class<? extends Object> aClass) {
-        return aClass==Long.class || aClass == long.class;
+        return aClass == Long.class || aClass == long.class;
     }
 
     /**
@@ -85,6 +87,6 @@ public class PreferenceManager implements InvocationHandler {
      * @return
      */
     public static <T> T getPreferences(Class<T> klass, SharedPreferences preferences) {
-        return (T) Proxy.newProxyInstance(PreferenceManager.class.getClassLoader(), new Class[] {klass}, new PreferenceManager(preferences));
+        return (T) Proxy.newProxyInstance(PreferenceManager.class.getClassLoader(), new Class[]{klass}, new PreferenceManager(preferences));
     }
 }

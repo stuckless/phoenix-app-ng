@@ -1,9 +1,8 @@
 package com.androideasyapps.phoenix.shared;
 
 import android.app.IntentService;
-
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import com.androideasyapps.phoenix.dao.MediaFile;
 import com.androideasyapps.phoenix.sync.SageTVSync;
@@ -50,6 +49,11 @@ public class SageTVSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        if (!AppInstance.getInstance(this).isReady()) {
+            log.warn("SageTV Sync Aborted, since SageTV is not configured.");
+            return;
+        }
+
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_SYNC_SAGETV.equals(action)) {
