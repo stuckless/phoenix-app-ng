@@ -67,12 +67,12 @@ public class UpdateRecommendationsService extends IntentService {
                             title = mf.getTitle() + " - " + mf.getEpisodeTitle();
                         }
 
-                        builder.setBackground(MediaUtil.getBackgroundURL(app.getServer(), mf, 1280))
+                        builder.setBackground(MediaUtil.getBackgroundURL(app.getServer(), mf, MediaUtil.DEFAULT_BACKGROUND_WIDTH))
                                 .setId(i)
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setTitle(mf.getTitle())
                                 .setDescription(MediaUtil.getMediaDescription(mf).toString())
-                                .setImage(MediaUtil.getPosterURL(app.getServer(), mf, 300))
+                                .setImage(MediaUtil.getPosterURL(app.getServer(), mf, MediaUtil.DEFAULT_POSTER_WIDTH))
                                 .setIntent(buildPendingIntent(mf))
                                 .build();
 

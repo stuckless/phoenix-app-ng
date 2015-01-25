@@ -350,7 +350,7 @@ public class MainFragment extends BrowseFragment {
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof MediaFile) {
-                mBackgroundURI = URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(MainFragment.this.getActivity()).getServer(), (MediaFile) item, 1280));
+                mBackgroundURI = URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(MainFragment.this.getActivity()).getServer(), (MediaFile) item, MediaUtil.DEFAULT_BACKGROUND_WIDTH));
                 startBackgroundTimer();
             }
 

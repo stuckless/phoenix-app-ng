@@ -106,7 +106,7 @@ public class CardPresenter extends Presenter {
             }
         }
         ((ViewHolder) viewHolder).mCardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-        ((ViewHolder) viewHolder).updateCardViewImageUIL(URI.create(MediaUtil.getPosterURL(AppInstance.getInstance(mContext).getServer(), movie, CARD_WIDTH)));
+        ((ViewHolder) viewHolder).updateCardViewImageUIL(URI.create(MediaUtil.getPosterURL(AppInstance.getInstance(mContext).getServer(), movie, MediaUtil.DEFAULT_POSTER_WIDTH)));
     }
 
     private CharSequence getTVContextText(MediaFile file) {

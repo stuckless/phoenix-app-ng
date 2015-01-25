@@ -94,7 +94,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                 DetailsActivity.SHARED_ELEMENT_NAME);
 
 
-        updateBackground(URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(this.getActivity()).getServer(), mSelectedMovie, 1280)));
+        updateBackground(URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(this.getActivity()).getServer(), mSelectedMovie, MediaUtil.DEFAULT_BACKGROUND_WIDTH)));
         setOnItemViewClickedListener(new ItemViewClickedListener());
 
         Log.i(TAG, "onCreate DetailsFragment Complete");
@@ -129,7 +129,7 @@ public class VideoDetailsFragment extends DetailsFragment {
             final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
             try {
                 int width = Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH);
-                ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie, width),
+                ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie, MediaUtil.DEFAULT_POSTER_WIDTH),
                         new ImageSize(Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH),
                                 Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_HEIGHT)),
                         new SimpleImageLoadingListener() {

@@ -30,10 +30,19 @@ public class VideoPlayerActivity extends Activity {
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         Log.d("KEYS", "KEYUP: " + keyCode);
         if (keyCode==KeyEvent.KEYCODE_DPAD_RIGHT) {
-            mMediaController.updatePosition(30000);
+            // first time we hit right/left is just shows the controller, second time will do the skip
+            if (mMediaController.isShowing()) {
+                mMediaController.updatePosition(30000);
+            } else {
+                mMediaController.show(5000);
+            }
             return true;
         } else if (keyCode==KeyEvent.KEYCODE_DPAD_LEFT) {
-            mMediaController.updatePosition(-10000);
+            if (mMediaController.isShowing()) {
+                mMediaController.updatePosition(-10000);
+            } else {
+                mMediaController.show(5000);
+            }
             return true;
         } else if (keyCode==KeyEvent.KEYCODE_DPAD_UP) {
             mMediaController.show(5000);

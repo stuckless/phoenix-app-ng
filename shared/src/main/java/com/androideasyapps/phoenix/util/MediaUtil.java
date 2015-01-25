@@ -17,6 +17,9 @@ import static com.androideasyapps.phoenix.util.Util.nullIfEmpty;
  * Created by seans on 21/12/14.
  */
 public class MediaUtil {
+    public static final int DEFAULT_POSTER_WIDTH=300;
+    public static final int DEFAULT_BACKGROUND_WIDTH=1280;
+
     static Pattern TVSEASONPattern = Pattern.compile("S([0-9]+)[ex\\.]+([0-9]+)", Pattern.CASE_INSENSITIVE);
     static Pattern TVAiringPattern = Pattern.compile("-([0-9]{4,12})-([0-9]{1,2})\\.", Pattern.CASE_INSENSITIVE);
 

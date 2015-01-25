@@ -94,7 +94,7 @@ public class SuggestionProvider extends ContentProvider {
                             MediaUtil.getMediaDescription(mf),
                             "video/*",
                             mf.getYear(),
-                            Uri.parse(MediaUtil.getPosterURL(AppInstance.getInstance(this.getContext()).getServer(), mf, 300))
+                            Uri.parse(MediaUtil.getPosterURL(AppInstance.getInstance(this.getContext()).getServer(), mf, MediaUtil.DEFAULT_POSTER_WIDTH))
                     });
                 }
             }
