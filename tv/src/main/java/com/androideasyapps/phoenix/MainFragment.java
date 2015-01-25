@@ -14,13 +14,6 @@
 
 package com.androideasyapps.phoenix;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -55,7 +48,6 @@ import com.androideasyapps.phoenix.services.phoenix.ViewItemMediaFileAdapter;
 import com.androideasyapps.phoenix.services.phoenix.model.ViewItem;
 import com.androideasyapps.phoenix.services.phoenix.model.ViewReply;
 import com.androideasyapps.phoenix.settings.SettingsActivity;
-import com.androideasyapps.phoenix.settings.SettingsFragment;
 import com.androideasyapps.phoenix.shared.AppInstance;
 import com.androideasyapps.phoenix.shared.MediaSource;
 import com.androideasyapps.phoenix.shared.MediaSyncEvent;
@@ -67,6 +59,13 @@ import com.squareup.picasso.Target;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -351,7 +350,7 @@ public class MainFragment extends BrowseFragment {
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof MediaFile) {
-                mBackgroundURI = URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(MainFragment.this.getActivity()).getServer(), (MediaFile) item));
+                mBackgroundURI = URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(MainFragment.this.getActivity()).getServer(), (MediaFile) item, 1280));
                 startBackgroundTimer();
             }
 

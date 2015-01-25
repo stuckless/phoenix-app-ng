@@ -30,9 +30,6 @@ import com.androideasyapps.phoenix.util.MediaUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.nostra13.universalimageloader.utils.ImageSizeUtils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.net.URI;
 
@@ -109,7 +106,7 @@ public class CardPresenter extends Presenter {
             }
         }
         ((ViewHolder) viewHolder).mCardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT);
-        ((ViewHolder) viewHolder).updateCardViewImageUIL(URI.create(MediaUtil.getPosterURL(AppInstance.getInstance(mContext).getServer(), movie)));
+        ((ViewHolder) viewHolder).updateCardViewImageUIL(URI.create(MediaUtil.getPosterURL(AppInstance.getInstance(mContext).getServer(), movie, CARD_WIDTH)));
     }
 
     private CharSequence getTVContextText(MediaFile file) {

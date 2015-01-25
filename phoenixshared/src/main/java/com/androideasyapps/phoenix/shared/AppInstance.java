@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 
 import com.androideasyapps.phoenix.dao.H2PersistenceManager;
 import com.androideasyapps.phoenix.dao.MediaFile;
@@ -18,6 +19,7 @@ import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -293,6 +295,8 @@ public class AppInstance {
                 //.delayBeforeLoading(1000)
                 .cacheInMemory(true) // default
                 .cacheOnDisk(true) // default
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.EXACTLY)
                 //.displayer(new FadeInBitmapDisplayer(300,true,true,true))
 
                 .build();

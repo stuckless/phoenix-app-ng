@@ -1,1 +1,1 @@
-include ':shared', ':mobile', ':tv', ':phoenixshared'
+include ':shared', ':mobile', ':tv', ':phoenixshared', ':ijkmediaplayer', ':ijkmediawidget'

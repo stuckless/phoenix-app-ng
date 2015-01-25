@@ -40,7 +40,7 @@ public class SageTVSync {
                                          final MediaFileH2DAO dao;
                                          log.info("Starting SageTV Sync");
                                          int last = 0;
-                                         int size = 100;
+                                         int size = 50;
                                          if (subscriber.isUnsubscribed()) return;
                                          subscriber.onStart();
 

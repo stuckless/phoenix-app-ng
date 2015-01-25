@@ -94,7 +94,7 @@ public class VideoDetailsFragment extends DetailsFragment {
                 DetailsActivity.SHARED_ELEMENT_NAME);
 
 
-        updateBackground(URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(this.getActivity()).getServer(), mSelectedMovie)));
+        updateBackground(URI.create(MediaUtil.getBackgroundURL(AppInstance.getInstance(this.getActivity()).getServer(), mSelectedMovie, 1280)));
         setOnItemViewClickedListener(new ItemViewClickedListener());
 
         Log.i(TAG, "onCreate DetailsFragment Complete");
@@ -128,7 +128,8 @@ public class VideoDetailsFragment extends DetailsFragment {
 
             final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedMovie);
             try {
-                ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie),
+                int width = Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH);
+                ImageLoader.getInstance().loadImage(MediaUtil.getPosterURL(server, mSelectedMovie, width),
                         new ImageSize(Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_WIDTH),
                                 Utils.convertDpToPixel(getActivity(), DETAIL_THUMB_HEIGHT)),
                         new SimpleImageLoadingListener() {
@@ -182,9 +183,11 @@ public class VideoDetailsFragment extends DetailsFragment {
                 @Override
                 public void onActionClicked(Action action) {
                     if (action.getId() == ACTION_WATCH) {
-                        Intent intent = new Intent(getActivity(), PlaybackOverlayActivity.class);
+                        AppInstance.getInstance(getActivity()).setSelectedMediaFile(mSelectedMovie);
+                        Intent intent = new Intent(getActivity(), VideoPlayerActivity.class);
                         intent.putExtra(getResources().getString(R.string.movie), mSelectedMovie);
                         intent.putExtra(getResources().getString(R.string.should_start), true);
+                        intent.setAction(Intent.ACTION_VIEW);
                         startActivity(intent);
                     } else if (action.getId() == ACTION_WATCH_EXT) {
                         try {

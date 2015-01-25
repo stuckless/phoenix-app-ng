@@ -55,16 +55,25 @@ public class MediaUtil {
         return 0;
     }
 
-    public static String getBackgroundURL(Server server, MediaFile mf) {
+    public static String getBackgroundURL(Server server, MediaFile mf, int width) {
         if (mf.getMediaFileId()>0) {
-            return getBaseServerUrl(server) + "/sagex/media/background/" + mf.getMediaFileId();
+            return scale(getBaseServerUrl(server) + "/sagex/media/background/" + mf.getMediaFileId(), width);
         } else {
             if (mf.getSeason()>0) {
-                return getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=background&season="+String.valueOf(mf.getSeason());
+                return scale(getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=background&season="+String.valueOf(mf.getSeason()), width);
             } else {
-                return getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=background";
+                return scale(getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=background", width);
             }
         }
+    }
+
+    private static String scale(String url, int width) {
+        if (url.contains("?")) {
+             url=url+"&";
+        } else {
+            url=url+"?";
+        }
+        return url+"scalex="+width;
     }
 
     private static String URLEncode(String str) {
@@ -76,14 +85,14 @@ public class MediaUtil {
         }
     }
 
-    public static String getPosterURL(Server server, MediaFile mf) {
+    public static String getPosterURL(Server server, MediaFile mf, int width) {
         if (mf.getMediaFileId()>0) {
-            return getBaseServerUrl(server) + "/sagex/media/poster/" + mf.getMediaFileId();
+            return scale(getBaseServerUrl(server) + "/sagex/media/poster/" + mf.getMediaFileId(), width);
         } else {
             if (mf.getSeason()>0) {
-                return getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=poster&season="+String.valueOf(mf.getSeason());
+                return scale(getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=poster&season="+String.valueOf(mf.getSeason()), width);
             } else {
-                return getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=poster";
+                return scale(getBaseServerUrl(server) + "/sagex/media/fanart?title=" + URLEncode(mf.getTitle()) + "&mediatype=" + URLEncode(mf.getMediaType()) + "&artifact=poster", width);
             }
         }
     }
@@ -169,5 +178,15 @@ public class MediaUtil {
 
     public static boolean isMovie(MediaFile file) {
         return file!=null&&"movie".equalsIgnoreCase(file.getMediaType());
+    }
+
+    public static CharSequence getLongTitle(MediaFile mf) {
+        if (mf==null) return "N/A";
+        if (isMovie(mf)) {
+            return mf.getTitle() + (mf.getYear()>0?" ("+mf.getYear()+")":"");
+        } else if (isTV(mf)) {
+            return mf.getTitle() + getTVContextText(mf);
+        }
+        return null;
     }
 }

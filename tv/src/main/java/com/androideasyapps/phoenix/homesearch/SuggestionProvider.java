@@ -1,27 +1,20 @@
 package com.androideasyapps.phoenix.homesearch;
         import android.app.SearchManager;
-        import android.content.ContentProvider;
-        import android.content.ContentResolver;
-        import android.content.ContentValues;
-        import android.content.UriMatcher;
-        import android.database.Cursor;
-        import android.database.MatrixCursor;
-        import android.net.Uri;
-        import android.provider.BaseColumns;
-        import android.support.v17.leanback.widget.ArrayObjectAdapter;
-        import android.support.v17.leanback.widget.HeaderItem;
-        import android.support.v17.leanback.widget.ListRow;
-        import android.util.Log;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.net.Uri;
+import android.provider.BaseColumns;
+import android.util.Log;
 
-        import com.androideasyapps.phoenix.CardPresenter;
-        import com.androideasyapps.phoenix.R;
-        import com.androideasyapps.phoenix.dao.MediaFile;
-        import com.androideasyapps.phoenix.dao.MediaFileH2DAO;
-        import com.androideasyapps.phoenix.shared.AppInstance;
-        import com.androideasyapps.phoenix.util.MediaUtil;
+import com.androideasyapps.phoenix.dao.MediaFile;
+import com.androideasyapps.phoenix.shared.AppInstance;
+import com.androideasyapps.phoenix.util.MediaUtil;
 
-        import java.io.FileNotFoundException;
-        import java.util.Collection;
+import java.util.Collection;
 
 /**
  * Provides access to the video database.
@@ -101,7 +94,7 @@ public class SuggestionProvider extends ContentProvider {
                             MediaUtil.getMediaDescription(mf),
                             "video/*",
                             mf.getYear(),
-                            Uri.parse(MediaUtil.getPosterURL(AppInstance.getInstance(this.getContext()).getServer(), mf))
+                            Uri.parse(MediaUtil.getPosterURL(AppInstance.getInstance(this.getContext()).getServer(), mf, 300))
                     });
                 }
             }
