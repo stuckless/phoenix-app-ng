@@ -1,5 +1,7 @@
 # SageTV App for Android TV
 
+<img src="https://raw.githubusercontent.com/stuckless/phoenix-app-ng/master/assets/screenshot_640.jpg"/>
+
 This application is more of a proof of concept in terms of code quality.   It currently will synchronize with your SageTV setup and show your SageTV content in AndroidTV.   Nothing is configurable.
 
 The application is building using Android Studio and Gradle.   If you want to work with this application, then use Android Studio, and import the build.gradle from the project root.  After several minutes, you should have a working Android Studio project with 4 modules.
